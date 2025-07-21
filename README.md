@@ -41,6 +41,7 @@ cd REDOTHERM
 
 ### 🧱 Repository Structure
 
+```bash
 REDOTHERM/
 │
 ├── core/              # Core thermodynamic functions
@@ -49,6 +50,7 @@ REDOTHERM/
 ├── examples/          # Usage examples and test cases
 ├── utils/             # Utility functions (plotting, integration, etc.)
 └── README.md
+```
 
 ---
 
