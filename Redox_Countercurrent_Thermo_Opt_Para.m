@@ -18,7 +18,8 @@ clc;
 close all;
 import py.CoolProp.CoolProp.*       % Load Python CoolProp package
 % cd functions\;
-addpath('functions');
+addpath(genpath('./functions'));    % Adds the functions in the subfolder 'functions'
+addpath(genpath('./materials'));    % Adds the functions in the subfolder 'materials'
 tic
 % Set optimization boundaries
 omega_red_min = 0.01;   % Minimum molar flow rate ratio between sweep gas and MO [mol-N2/mol-MO]
@@ -67,19 +68,19 @@ else
 end
 % --- Input to sweep over ---
 % Heat recovery
-eps_HR = [0.25 0.75];       % Solid heat recovery effectiveness
+eps_HR = [0 0.25 0.5 0.75 1];       % Solid heat recovery effectiveness
 % eps_HR = 0.5;
-% eps_HR_ox = [0.4 0.8];              % Exothermic oxidation heat recovery effectiveness
-eps_HR_ox = 0.8;              % Exothermic oxidation heat recovery effectiveness
+eps_HR_ox = [0.4 0.8];              % Exothermic oxidation heat recovery effectiveness
+% eps_HR_ox = 0.8;              % Exothermic oxidation heat recovery effectiveness
 eta_ox_htw = 0.4;                   % Efficiency of converting heat to work from excess exothermic heat
 eps_g = 0.8;                        % Gas-gas heat recovery effectiveness
 % Select redox material 1-CeO2,2-CeZr20,3-LCMA,4-LSM40,5-Fe33Al67
-redox_material = [1 2 3 4];
+redox_material = [ 3 4];
 % redox_material = [1];
 % Select CO2 or H2O splitting (1-H2O, 2-CO2)
 K_input = 1;
 % Select H2-H2O separation technology (1-condensation,2-mechanical vapor recompression)
-prod_sep_flag = [1 2];
+prod_sep_flag = [1];
 % Choose optimizer
 % 1 - fmincon
 % 2 - Surrogate Optimization (surrogateopt) - NOT WORKING
@@ -154,9 +155,9 @@ for I=1:length(redox_material)
                                 MO_label = 'LCMA';              % Material label
                                 red_mode = 0;                   % Reduction mode (0 - material that exhibits increase in nonstoichiomtery as it is reduced)
                                 delta0 = 0;                     % Initial delta - should be zero for "type 0" materials
-                                phi_fun = @(delta)(2-delta);    % Phi function handle
+                                phi_fun = @(delta)(3-delta);    % Phi function handle
                                 dphi_fun = @(delta)(-1);        % d(phi)/d(delta) function handle
-                                delta_fun = @(phi)(2-phi);      % Delta function handle
+                                delta_fun = @(phi)(3-phi);      % Delta function handle
                                 ddelta_fun = @(phi)(-1);        % d(delta)/d(phi) function handle
                                 phi0 = phi_fun(delta0);         % Initial phi
                             case 4
@@ -172,9 +173,9 @@ for I=1:length(redox_material)
                                 MO_label = 'LSM40';             % Material label
                                 red_mode = 0;                   % Reduction mode (0 - material that exhibits increase in nonstoichiomtery as it is reduced)
                                 delta0 = 0;                     % Initial delta - should be zero for "type 0" materials
-                                phi_fun = @(delta)(2-delta);    % Phi function handle
+                                phi_fun = @(delta)(3-delta);    % Phi function handle
                                 dphi_fun = @(delta)(-1);        % d(phi)/d(delta) function handle
-                                delta_fun = @(phi)(2-phi);      % Delta function handle
+                                delta_fun = @(phi)(3-phi);      % Delta function handle
                                 ddelta_fun = @(phi)(-1);        % d(delta)/d(phi) function handle
                                 phi0 = phi_fun(delta0);         % Initial phi
                             case 5

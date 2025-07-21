@@ -16,7 +16,8 @@ clc;
 close all;
 import py.CoolProp.CoolProp.*       % Load Python CoolProp package
 % cd functions\;
-addpath('functions');
+addpath(genpath('./functions'));    % Adds the functions in the subfolder 'functions'
+addpath(genpath('./materials'));    % Adds the functions in the subfolder 'materials'
 % Plotting defaults
 % Settings
 set(groot, 'DefaultLineLineWidth', 2);
@@ -208,9 +209,9 @@ switch redox_material
         MO_label = 'LCMA';              % Material label
         red_mode = 0;                   % Reduction mode (0 - material that exhibits increase in nonstoichiomtery as it is reduced)
         delta0 = 0;                     % Initial delta - should be zero for "type 0" materials
-        phi_fun = @(delta)(2-delta);    % Phi function handle
+        phi_fun = @(delta)(3-delta);    % Phi function handle
         dphi_fun = @(delta)(-1);        % d(phi)/d(delta) function handle
-        delta_fun = @(phi)(2-phi);      % Delta function handle
+        delta_fun = @(phi)(3-phi);      % Delta function handle
         ddelta_fun = @(phi)(-1);        % d(delta)/d(phi) function handle
         phi0 = phi_fun(delta0);         % Initial phi
     case 4
@@ -226,9 +227,9 @@ switch redox_material
         MO_label = 'LSM40';             % Material label
         red_mode = 0;                   % Reduction mode (0 - material that exhibits increase in nonstoichiomtery as it is reduced)
         delta0 = 0;                     % Initial delta - should be zero for "type 0" materials
-        phi_fun = @(delta)(2-delta);    % Phi function handle
+        phi_fun = @(delta)(3-delta);    % Phi function handle
         dphi_fun = @(delta)(-1);        % d(phi)/d(delta) function handle
-        delta_fun = @(phi)(2-phi);      % Delta function handle
+        delta_fun = @(phi)(3-phi);      % Delta function handle
         ddelta_fun = @(phi)(-1);        % d(delta)/d(phi) function handle
         phi0 = phi_fun(delta0);         % Initial phi
     case 5

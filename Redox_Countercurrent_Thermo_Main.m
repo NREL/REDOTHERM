@@ -15,7 +15,8 @@ clearvars;
 clc;
 close all;
 import py.CoolProp.CoolProp.*       % Using CoolProp for thermodynamic properties
-addpath(genpath('./functions'));    % Adds the functions in the subfolder functions
+addpath(genpath('./functions'));    % Adds the functions in the subfolder 'functions'
+addpath(genpath('./materials'));    % Adds the functions in the subfolder 'materials'
 tic                                 % Start time counter
 % Plotting defaults
 % Settings
@@ -222,9 +223,9 @@ switch redox_material
         MO_label = 'LCMA';              % Material label
         red_mode = 0;                   % Reduction mode (0 - material that exhibits increase in nonstoichiomtery as it is reduced)
         delta0 = 0;                     % Initial delta - should be zero for "type 0" materials
-        phi_fun = @(delta)(2-delta);    % Phi function handle
+        phi_fun = @(delta)(3-delta);    % Phi function handle
         dphi_fun = @(delta)(-1);        % d(phi)/d(delta) function handle
-        delta_fun = @(phi)(2-phi);      % Delta function handle
+        delta_fun = @(phi)(3-phi);      % Delta function handle
         ddelta_fun = @(phi)(-1);        % d(delta)/d(phi) function handle
         phi0 = phi_fun(delta0);         % Initial phi
     case 4
@@ -240,9 +241,9 @@ switch redox_material
         MO_label = 'LSM40';             % Material label
         red_mode = 0;                   % Reduction mode (0 - material that exhibits increase in nonstoichiomtery as it is reduced)
         delta0 = 0;                     % Initial delta - should be zero for "type 0" materials
-        phi_fun = @(delta)(2-delta);    % Phi function handle
+        phi_fun = @(delta)(3-delta);    % Phi function handle
         dphi_fun = @(delta)(-1);        % d(phi)/d(delta) function handle
-        delta_fun = @(phi)(2-phi);      % Delta function handle
+        delta_fun = @(phi)(3-phi);      % Delta function handle
         ddelta_fun = @(phi)(-1);        % d(delta)/d(phi) function handle
         phi0 = phi_fun(delta0);         % Initial phi
     case 5
@@ -370,18 +371,20 @@ switch K_input
         HHV = 283.4e3;
 end
 %% Overall thermo - iterative
-delta_tol = Inf;
+% Initialize values to avoid code breaking and ensure going into the loop
+delta_tol = Inf;        % Overall tolerance in 'phi' difference between iterations
 phi_red_PF = Inf;
 phi_red_CF = Inf;
-phi_ox_PF = Inf;
-phi_ox_CF = Inf;
+phi_ox_PF = phi0;
+phi_ox_CF = phi0;
 if MFR_flag==1
     phi_red_MFR = Inf;
-    phi_ox_MFR = Inf;
+    phi_ox_MFR = phi0;
 end
-iter_count = 0;
+iter_count = 0;     % Counting iterations
 while abs(delta_tol)>1e-5
-    iter_count = iter_count + 1;
+    iter_count = iter_count + 1;        % Update iterations count
+    % Use previous phi values as "old"
     phi_red_PF_old = phi_red_PF;
     phi_red_CF_old = phi_red_CF;
     phi_ox_PF_old = phi_ox_PF;
@@ -454,13 +457,16 @@ while abs(delta_tol)>1e-5
         prod_red_MFR = 0.5*delta_phi_MFR*1e6/(M_MO*1e3);                                        % Reduction productivity [micro-mole_O2/g_MO)
         prod_ox_MFR = 2*prod_red_MFR;                                                           % Oxidation productivity [micro-mole_prod/g_MO)
     end
+    % Find the largest difference between "phi" values between current and
+    % previous iterations:
     if MFR_flag==1
+        delta_tol = max([phi_red_PF-phi_red_PF_old,phi_red_CF-phi_red_CF_old,phi_red_MFR-phi_red_MFR_old,phi_ox_PF-phi_ox_PF_old,phi_ox_CF-phi_ox_CF_old,phi_ox_MFR-phi_ox_MFR_old]);
     else
         delta_tol = max([phi_red_PF-phi_red_PF_old,phi_red_CF-phi_red_CF_old,phi_ox_PF-phi_ox_PF_old,phi_ox_CF-phi_ox_CF_old]);
     end
 end
-runtime = toc;
-%% Display
+runtime = toc;      % Stop runtime clock
+%% Display results
 disp('----- Reduction -----');
 disp(['The maximum O2 exchange for parallel flow (PF) reduction is: ',num2str(nO2_max_PF)]);
 disp(['The maximum O2 exchange for countercurrent flow (CF) reduction is: ',num2str(nO2_max_CF)]);
