@@ -44,11 +44,14 @@ cd REDOTHERM
 ```bash
 REDOTHERM/
 │
-├── core/              # Core thermodynamic functions
-├── functions/         # Functions for optimization and cycle performance
-├── materials/         # Thermodynamic properties of redox-active materials
-├── examples/          # Usage examples and test cases
-├── utils/             # Utility functions (plotting, integration, etc.)
+├── core/                                  # Core thermodynamic functions
+├── functions/                             # Functions for optimization and cycle performance
+├── materials/                             # Thermodynamic properties of redox-active materials
+├── examples/                              # Usage examples and test cases
+├── utils/                                 # Utility functions (plotting, integration, etc.)
+├── Redox_Countercurrent_Thermo_Main.m     # Running REDOTHERM for a single or parametric run
+├── Redox_Countercurrent_Thermo_Opt.m      # Running REDOTHERM for a single optimization analysis
+├── Redox_Countercurrent_Thermo_Opt_Para.m # Running REDOTHERM for multiple optimization runs
 ├── LICENSE            # License file
 └── README.md          # Readme file
 ```
