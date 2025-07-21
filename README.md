@@ -2,6 +2,14 @@
 
 **REDOTHERM** is an open-source, MATLAB-based thermodynamic modeling framework developed to evaluate the performance of redox-active materials for water (H2O) and carbon dioxide (CO2) splitting. It includes models of all major unit operations and supports comparative analysis of different redox-active material candidates. The model is tailored for systems of moving oxide under a parallel/cocurrent flow (PF) and countercurrent flow (CF) configurations. Unvalidated mixed flow reactor (MFR, also known as CSTR) model is also included as an optional addition.
 
+The development of REDOTHERM was done by Alon Lidor and Janna Martinek at the National Renewable Energy Laboratory.
+
+---
+
+## LICENSE
+
+[License](https://github.com/NREL/REDOTHERM/blob/main/LICENSE)
+
 ---
 
 ## 🔧 Features
@@ -31,4 +39,19 @@ cd REDOTHERM
 
 ---
 
-## :books: Documentation
+### 🧱 Repository Structure
+
+REDOTHERM/
+│
+├── core/              # Core thermodynamic functions
+├── functions/         # Functions for optimization and cycle performance
+├── materials/         # Thermodynamic properties of redox-active materials
+├── examples/          # Usage examples and test cases
+├── utils/             # Utility functions (plotting, integration, etc.)
+└── README.md
+
+---
+
+## 📚 Documentation
+
+The model structure, functionality of each script, and the derviation of all the equations are provided in a manuscript current under review. A URL will be provided here once the paper is accepted and online. In the meantime, for any questions about the usage or methodology, please email [Dr. Alon Lidor](mailto:alon.lidor@nrel.gov)
