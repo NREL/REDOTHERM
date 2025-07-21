@@ -17,9 +17,10 @@ clearvars;
 clc;
 close all;
 import py.CoolProp.CoolProp.*       % Load Python CoolProp package
-% cd functions\;
+% add paths to required function folders
 addpath(genpath('./functions'));    % Adds the functions in the subfolder 'functions'
 addpath(genpath('./materials'));    % Adds the functions in the subfolder 'materials'
+addpath(genpath('./core'));         % Adds the functions in the subfolder 'core'
 tic
 % Set optimization boundaries
 omega_red_min = 0.01;   % Minimum molar flow rate ratio between sweep gas and MO [mol-N2/mol-MO]
@@ -69,18 +70,15 @@ end
 % --- Input to sweep over ---
 % Heat recovery
 eps_HR = [0 0.25 0.5 0.75 1];       % Solid heat recovery effectiveness
-% eps_HR = 0.5;
 eps_HR_ox = [0.4 0.8];              % Exothermic oxidation heat recovery effectiveness
-% eps_HR_ox = 0.8;              % Exothermic oxidation heat recovery effectiveness
 eta_ox_htw = 0.4;                   % Efficiency of converting heat to work from excess exothermic heat
 eps_g = 0.8;                        % Gas-gas heat recovery effectiveness
 % Select redox material 1-CeO2,2-CeZr20,3-LCMA,4-LSM40,5-Fe33Al67
-redox_material = [ 3 4];
-% redox_material = [1];
+redox_material = [1 2 3 4];
 % Select CO2 or H2O splitting (1-H2O, 2-CO2)
 K_input = 1;
 % Select H2-H2O separation technology (1-condensation,2-mechanical vapor recompression)
-prod_sep_flag = [1];
+prod_sep_flag = [1 2];
 % Choose optimizer
 % 1 - fmincon
 % 2 - Surrogate Optimization (surrogateopt) - NOT WORKING
@@ -96,6 +94,8 @@ Ox_name = {'_H2O','_CO2'};
 Prod_sep_name = {'_cond','_MVR'};
 num_runs = length(redox_material)*length(prod_sep_flag)*length(eps_HR)*length(eps_HR_ox);   % Number of total runs
 %% Start looping over all parameters
+% NOTE: the derviative conditions have been found to be non-applicable,
+% they are kept as legacy but not used in the thermodynamic functions
 for I=1:length(redox_material)
     for J=1:length(prod_sep_flag)
         for K=1:length(eps_HR)
@@ -106,11 +106,17 @@ for I=1:length(redox_material)
                         switch redox_material(I)
                             case 1
                                 M_MO = 172.1e-3;                                            % Molar mass of ceria [kg/mol]
-                                rho_MO = 7220;                                              % Solid density [kg/m^3]
+                                % -------
+                                % If using MATLAB version of the CeO2
+                                % material functions uncomment these:
                                 % dH_fun = @(delta)Reduction_Enthalpy_CeO2(delta);            % Reduction enthalpy function handle
                                 % dS_fun = @(delta)Reduction_Entropy_CeO2(delta);             % Reduction entropy function handle
-                                dH_fun = @(delta)panlener_dhfun_mex(delta);            % Reduction enthalpy function handle
-                                dS_fun = @(delta)panlener_dsfun_mex(delta);             % Reduction entropy function handle
+                                % -------
+                                % If using MEX version of the CeO2 material
+                                % functions uncomment these:
+                                dH_fun = @(delta)panlener_dhfun_mex(delta);                 % Reduction enthalpy function handle
+                                dS_fun = @(delta)panlener_dsfun_mex(delta);                 % Reduction entropy function handle
+                                % -------
                                 dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_CeO2(delta); % Reduction enthalpy derivative function handle
                                 dS_ddelta_fun = @(delta)Reduction_Entropy_Der_CeO2(delta);  % Reduction entropy derivative function handle
                                 cp_s_fun = @(T)cp_ceria_only(T);                            % MO specific heat capacity function [J/kg-K]
@@ -126,7 +132,6 @@ for I=1:length(redox_material)
                                 phi0 = phi_fun(delta0);         % Initial phi
                             case 2
                                 M_MO = 162.33759e-3;                                            % Molar mass of Ce0.8Zr0.2O2 [kg/mol]
-                                rho_MO = 7220;                                                  % Solid density [kg/m^3]
                                 dH_fun = @(delta)Reduction_Enthalpy_CeZr20(delta);              % Reduction enthalpy function handle
                                 dS_fun = @(delta)Reduction_Entropy_CeZr20(delta);               % Reduction entropy function handle
                                 dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_CeZr20(delta);   % Reduction enthalpy derivative function handle
@@ -144,7 +149,6 @@ for I=1:length(redox_material)
                                 phi0 = phi_fun(delta0);         % Initial phi
                             case 3
                                 M_MO = 0.6*M_La+0.4*M_Ca+0.6*M_Mn+0.4*M_Al+M_O*3;           % Molar mass of LCMA6464 [kg/mol] - La0.6Ca0.4Mn0.6Al0.4O3
-                                rho_MO = 7000;                                              % Solid density [kg/m^3] - PLACEHOLDER VALUE FOR THIS MATERIAL
                                 dH_fun = @(delta)Reduction_Enthalpy_LCMA(delta);            % Reduction enthalpy function handle
                                 dS_fun = @(delta)Reduction_Entropy_LCMA(delta);             % Reduction entropy function handle
                                 dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_LCMA(delta); % Reduction enthalpy derivative function handle
@@ -162,7 +166,6 @@ for I=1:length(redox_material)
                                 phi0 = phi_fun(delta0);         % Initial phi
                             case 4
                                 M_MO = 0.6*M_La+0.4*M_Sr+M_O*3;                             % Molar mass of LSM40 [kg/mol] - La0.6Sr0.4O3
-                                rho_MO = 7000;                                              % Solid density [kg/m^3] - PLACEHOLDER VALUE FOR THIS MATERIAL
                                 dH_fun = @(delta)Reduction_Enthalpy_LSM40(delta);           % Reduction enthalpy function handle
                                 dS_fun = @(delta)Reduction_Entropy_LSM40(delta);            % Reduction entropy function handle
                                 dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_LSM40(delta);% Reduction enthalpy derivative function handle
@@ -180,13 +183,12 @@ for I=1:length(redox_material)
                                 phi0 = phi_fun(delta0);         % Initial phi
                             case 5
                                 M_MO = 0.33*M_Fe+0.67*M_Al+4*M_O/(3-1/3);                       % Molar mass of Fe33Al67 [kg/mol] - Fe_0.33-Al_0.67-O_4/(3-1/3)
-                                rho_MO = 7000;                                                  % Solid density [kg/m^3] - PLACEHOLDER VALUE FOR THIS MATERIAL
                                 dH_fun = @(delta)Reduction_Enthalpy_Fe33Al67(delta);            % Reduction enthalpy function handle
                                 dS_fun = @(delta)Reduction_Entropy_Fe33Al67(delta);             % Reduction entropy function handle
                                 dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_Fe33Al67(delta); % Reduction enthalpy derivative function handle
                                 dS_ddelta_fun = @(delta)Reduction_Entropy_Der_Fe33Al67(delta);  % Reduction entropy derivative function handle
                                 cp_s_fun = @(T)168/M_MO;                                        % MO specific heat capacity function [J/kg-K]
-                                delta_0 = 0.26;                                                 % Initial nonstoichiometry (for MFR)
+                                delta_0 = 1/3;                                                  % Initial nonstoichiometry (for MFR)
                                 nO2_total = 0.5/2;                  % Maximum specific O2 release per mole of redox material [mol-O2/mol-redox] (MATERIAL DEPENDENT)
                                 MO_label = 'Fe33Al67';              % Material label
                                 red_mode = 1;                       % Reduction mode (1 - material that exhibits decrease in nonstoichiomtery as it is reduced)
@@ -253,16 +255,6 @@ for I=1:length(redox_material)
         end
     end
 end
-%% Save data
-% if ~isempty(filename_str)
-%     % Get a list of all variables
-%     allvars = whos;
-%     % Identify the variables that ARE NOT graphics handles. This uses a regular
-%     % expression on the class of each variable to check if it's a graphics object
-%     tosave = cellfun(@isempty, regexp({allvars.class}, '^matlab\.(ui|graphics)\.'));
-%     % Pass these variable names to save
-%     save(filename_str, allvars(tosave).name);
-% end
 %% Functions
 function result = CP_PropsSI(varargin)
     % Shorthand version of CoolProp for MATLAB

@@ -17,6 +17,7 @@ close all;
 import py.CoolProp.CoolProp.*       % Using CoolProp for thermodynamic properties
 addpath(genpath('./functions'));    % Adds the functions in the subfolder 'functions'
 addpath(genpath('./materials'));    % Adds the functions in the subfolder 'materials'
+addpath(genpath('./core'));         % Adds the functions in the subfolder 'core'
 tic                                 % Start time counter
 % Plotting defaults
 % Settings
@@ -171,14 +172,22 @@ end
 % NOTE: the initial delta for MFR can't be too low due to numerical
 % stability issues (solution converges to zero), but it must not be too
 % high as well otherwise it will overpredict performance
+% NOTE 2: the derviative conditions have been found to be non-applicable,
+% they are kept as legacy but not used in the thermodynamic functions
 switch redox_material
     case 1
         M_MO = 172.1e-3;                                            % Molar mass of ceria [kg/mol]
-        rho_MO = 7220;                                              % Solid density [kg/m^3]
+        % -------
+        % If using MATLAB version of the CeO2 material functions uncomment
+        % these:
         % dH_fun = @(delta)Reduction_Enthalpy_CeO2(delta);            % Reduction enthalpy function handle
         % dS_fun = @(delta)Reduction_Entropy_CeO2(delta);             % Reduction entropy function handle
+        % -------
+        % If using MEX version of the CeO2 material functions uncomment
+        % these:
         dH_fun = @(delta)panlener_dhfun_mex(delta);            % Reduction enthalpy function handle
         dS_fun = @(delta)panlener_dsfun_mex(delta);             % Reduction entropy function handle
+        % -------
         dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_CeO2(delta); % Reduction enthalpy derivative function handle
         dS_ddelta_fun = @(delta)Reduction_Entropy_Der_CeO2(delta);  % Reduction entropy derivative function handle
         cp_s_fun = @(T)cp_ceria_only(T);                            % MO specific heat capacity function [J/kg-K]
@@ -194,7 +203,6 @@ switch redox_material
         phi0 = phi_fun(delta0);         % Initial phi
     case 2
         M_MO = 162.33759e-3;                                            % Molar mass of Ce0.8Zr0.2O2 [kg/mol]
-        rho_MO = 7220;                                                  % Solid density [kg/m^3]
         dH_fun = @(delta)Reduction_Enthalpy_CeZr20(delta);              % Reduction enthalpy function handle
         dS_fun = @(delta)Reduction_Entropy_CeZr20(delta);               % Reduction entropy function handle
         dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_CeZr20(delta);   % Reduction enthalpy derivative function handle
@@ -212,7 +220,6 @@ switch redox_material
         phi0 = phi_fun(delta0);         % Initial phi
     case 3
         M_MO = 0.6*M_La+0.4*M_Ca+0.6*M_Mn+0.4*M_Al+M_O*3;           % Molar mass of LCMA6464 [kg/mol] - La0.6Ca0.4Mn0.6Al0.4O3
-        rho_MO = 7000;                                              % Solid density [kg/m^3] - PLACEHOLDER VALUE FOR THIS MATERIAL
         dH_fun = @(delta)Reduction_Enthalpy_LCMA(delta);            % Reduction enthalpy function handle
         dS_fun = @(delta)Reduction_Entropy_LCMA(delta);             % Reduction entropy function handle
         dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_LCMA(delta); % Reduction enthalpy derivative function handle
@@ -230,7 +237,6 @@ switch redox_material
         phi0 = phi_fun(delta0);         % Initial phi
     case 4
         M_MO = 0.6*M_La+0.4*M_Sr+M_O*3;                             % Molar mass of LSM40 [kg/mol] - La0.6Sr0.4O3
-        rho_MO = 7000;                                              % Solid density [kg/m^3] - PLACEHOLDER VALUE FOR THIS MATERIAL
         dH_fun = @(delta)Reduction_Enthalpy_LSM40(delta);           % Reduction enthalpy function handle
         dS_fun = @(delta)Reduction_Entropy_LSM40(delta);            % Reduction entropy function handle
         dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_LSM40(delta);% Reduction enthalpy derivative function handle
@@ -248,7 +254,6 @@ switch redox_material
         phi0 = phi_fun(delta0);         % Initial phi
     case 5
         M_MO = 0.33*M_Fe+0.67*M_Al+(4/(3-1/3))*M_O;                     % Molar mass of Fe33Al67 [kg/mol] - Fe0.33Al0.67.O4
-        rho_MO = 7000;                                                  % Solid density [kg/m^3] - PLACEHOLDER VALUE FOR THIS MATERIAL
         dH_fun = @(delta)Reduction_Enthalpy_Fe33Al67(delta);            % Reduction enthalpy function handle
         dS_fun = @(delta)Reduction_Entropy_Fe33Al67(delta);             % Reduction entropy function handle
         dH_ddelta_fun = @(delta)Reduction_Enthalpy_Der_Fe33Al67(delta); % Reduction enthalpy derivative function handle
