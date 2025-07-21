@@ -49,7 +49,8 @@ REDOTHERM/
 ├── materials/         # Thermodynamic properties of redox-active materials
 ├── examples/          # Usage examples and test cases
 ├── utils/             # Utility functions (plotting, integration, etc.)
-└── README.md
+├── LICENSE            # License file
+└── README.md          # Readme file
 ```
 
 ---
