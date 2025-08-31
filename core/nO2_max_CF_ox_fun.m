@@ -14,6 +14,7 @@ function nO2_max = nO2_max_CF_ox_fun(T,p,x_r_in,x_p_in,omega,nO2_total,pO2_fun,p
 % phi_red -     Initial O content (end of reduction)
 % Output:
 % nO2_max -      Maximum O2 exchange for countercurrent flow (CF) oxidation [mol]
+p_ref = 1e5;                            % Reference pressure [Pa]
 nO2 = linspace(0,nO2_total,1000);       % Initialize array of nO2
 for I=1:length(nO2)
     n = nO2(I);
@@ -27,7 +28,7 @@ for I=1:length(nO2)
         delta = 2*n_i;      % Current reduction extent (twice nO2)
         n_tag = n-n_i;      % Inverse reaction coordinate (for the counter flow)
         % Reacting gas
-        pO2_gas = p*(K*(omega*x_r_in-2*n_tag)/(omega*x_p_in+2*n_tag))^2;                                % Equilibrium O2 pressure in gas stream at current conditions [Pa]
+        pO2_gas = p_ref*(K*(omega*x_r_in-2*n_tag)/(omega*x_p_in+2*n_tag))^2;                                % Equilibrium O2 pressure in gas stream at current conditions [Pa]
         % pO2_gas_der = -4*omega*K^2*p*(x_r_in+x_p_in)*(omega*x_r_in-2*n_tag)/(omega*x_p_in+2*n_tag)^3;   % Derivative of pO2 by reaction coordinate [Pa/mol-O2]
         % Metal oxide
         pO2_MO = pO2_fun(T,delta_fun(phi_red+delta));      % Equlibrium O2 pressure [Pa]

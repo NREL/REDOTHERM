@@ -14,11 +14,12 @@ function nO2_max = nO2_max_PF_ox_fun(T,p,x_r_in,x_p_in,omega,nO2_total,pO2_fun,K
 % phi_red -     Initial O content (end of reduction)
 % Output
 % nO_2max -     Maximum O2 exchange for parallel flow (PF) oxidation [mol]
-nO2 = linspace(0,nO2_total,1000);  % Initialize array of nO2
+p_ref = 1e5;                            % Reference pressure [Pa]
+nO2 = linspace(0,nO2_total,1000);       % Initialize array of nO2
 for I=1:length(nO2)
     n = nO2(I);
-    pO2_gas = p*(K*(omega*x_r_in-2*n)/(omega*x_p_in+2*n))^2;    % Equilibrium O2 pressure in gas stream at current conditions [Pa]
-    pO2_MO = pO2_fun(T,delta_fun(phi_red+2*n));                 % Equilibrium O2 pressure over metal oxide at current conditions [Pa]
+    pO2_gas = p_ref*(K*(omega*x_r_in-2*n)/(omega*x_p_in+2*n))^2;    % Equilibrium O2 pressure in gas stream at current conditions [Pa]
+    pO2_MO = pO2_fun(T,delta_fun(phi_red+2*n));                     % Equilibrium O2 pressure over metal oxide at current conditions [Pa]
     if (n==nO2_total)               % Check if we reached the maximum O2 exchange
         nO2_max = n;
         return;
