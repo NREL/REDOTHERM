@@ -60,4 +60,5 @@ REDOTHERM/
 
 ## 📚 Documentation
 
-The model structure, functionality of each script, and the derviation of all the equations are provided in a manuscript current under review. A URL will be provided here once the paper is accepted and online. In the meantime, for any questions about the usage or methodology, please email [Dr. Alon Lidor](mailto:alon.lidor@nrel.gov)
+The model structure, functionality of each script, and the derviation of all the equations are provided in the following paper: [https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2025.1665986/full](https://www.frontiersin.org/journals/energy-research/articles/10.3389/fenrg.2025.1665986/full). For any further questions about the usage or methodology, please email [Dr. Alon Lidor](mailto:alon.lidor@nrel.gov)
+
